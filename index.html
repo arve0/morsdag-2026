@@ -2,7 +2,9 @@
 <html lang="no">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <title>Morsdag 2026 - Bilspill</title>
     <style>
         body {
@@ -14,10 +16,13 @@
             align-items: center;
             min-height: 100vh;
             font-family: Arial, sans-serif;
+            overflow: hidden;
+            touch-action: none;
         }
         #game-container {
             border: 3px solid #444;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            touch-action: none;
         }
     </style>
 </head>

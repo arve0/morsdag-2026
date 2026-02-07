@@ -70,6 +70,22 @@ export default class GameScene extends Phaser.Scene {
             right: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D)
         };
 
+        // Setup touch controls
+        this.touchDirection = null;
+        this.input.on('pointerdown', (pointer) => {
+            if (this.canMove && !this.hasFinished) {
+                this.handleTouch(pointer.x, pointer.y);
+            }
+        });
+        this.input.on('pointermove', (pointer) => {
+            if (pointer.isDown && this.canMove && !this.hasFinished) {
+                this.handleTouch(pointer.x, pointer.y);
+            }
+        });
+        this.input.on('pointerup', () => {
+            this.touchDirection = null;
+        });
+
         // Prepare audio (don't play yet)
         if (this.sound.get('bgMusic')) {
             this.bgMusic = this.sound.get('bgMusic');
@@ -340,6 +356,40 @@ export default class GameScene extends Phaser.Scene {
         });
     }
 
+    handleTouch(x, y) {
+        // Beregn retning fra bil til touch-punkt
+        const dx = x - this.car.x;
+        const dy = y - this.car.y;
+
+        // Beregn vinkel i radianer
+        const angle = Math.atan2(dy, dx);
+
+        // Konverter til grader
+        const degrees = Phaser.Math.RadToDeg(angle);
+
+        // Normaliser til 0-360
+        const normalizedDegrees = (degrees + 360) % 360;
+
+        // Rund av til nærmeste 45-graders inkrement (8 retninger)
+        // 0° = Øst, 45° = Sørøst, 90° = Sør, 135° = Sørvest, 180° = Vest, 225° = Nordvest, 270° = Nord, 315° = Nordøst
+        const directionIndex = Math.round(normalizedDegrees / 45) % 8;
+
+        // Kartlegg til retninger
+        const directions = [
+            { x: 1, y: 0 },    // Øst
+            { x: 1, y: 1 },    // Sørøst
+            { x: 0, y: 1 },    // Sør
+            { x: -1, y: 1 },   // Sørvest
+            { x: -1, y: 0 },   // Vest
+            { x: -1, y: -1 },  // Nordvest
+            { x: 0, y: -1 },   // Nord
+            { x: 1, y: -1 }    // Nordøst
+        ];
+
+        this.touchDirection = directions[directionIndex];
+        this.hasStarted = true;
+    }
+
     update() {
         if (this.hasFinished) return;
 
@@ -351,16 +401,24 @@ export default class GameScene extends Phaser.Scene {
 
         // Only allow movement if canMove is enabled
         if (this.canMove) {
-            if (this.cursors.up.isDown || this.wasd.up.isDown) {
+            // Check touch direction first
+            if (this.touchDirection) {
+                velocityX = this.touchDirection.x * speed;
+                velocityY = this.touchDirection.y * speed;
+            }
+            // Then check keyboard controls
+            else if (this.cursors.up.isDown || this.wasd.up.isDown) {
                 velocityY = -speed;
             } else if (this.cursors.down.isDown || this.wasd.down.isDown) {
                 velocityY = speed;
             }
 
-            if (this.cursors.left.isDown || this.wasd.left.isDown) {
-                velocityX = -speed;
-            } else if (this.cursors.right.isDown || this.wasd.right.isDown) {
-                velocityX = speed;
+            if (!this.touchDirection) {
+                if (this.cursors.left.isDown || this.wasd.left.isDown) {
+                    velocityX = -speed;
+                } else if (this.cursors.right.isDown || this.wasd.right.isDown) {
+                    velocityX = speed;
+                }
             }
 
             // Mark as started if any movement key is pressed
