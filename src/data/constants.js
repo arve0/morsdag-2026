@@ -1,6 +1,9 @@
 // Game constants
-export const GAME_WIDTH = 1024;
-export const GAME_HEIGHT = 768;
+export const GAME_WIDTH = 864;
+export const GAME_HEIGHT = 1184;
+
+export const SHOP_IMAGE_WIDTH = 1024;
+export const SHOP_IMAGE_HEIGHT = 768;
 
 // Shop prices
 export const SHOP_PRICES = {
@@ -26,17 +29,17 @@ export const BERRY_POSITIONS = {
 
 // Start and finish areas (will be adjusted based on actual track image)
 export const START_AREA = {
-    x: 437,  // Center horizontally: (1024 - 150) / 2
-    y: 60,   // Moved down to show START text
+    x: Math.floor((GAME_WIDTH - 150) / 2),
+    y: 90,
     width: 150,
     height: 100
 };
 
 export const FINISH_AREA = {
-    x: 437,  // Center horizontally: (1024 - 150) / 2
-    y: 680,  // Closer to bottom of screen
+    x: Math.floor((GAME_WIDTH - 150) / 2),
+    y: GAME_HEIGHT - 50,
     width: 150,
-    height: 100
+    height: 50
 };
 
 // Game settings
@@ -45,3 +48,4 @@ export const CAR_ROTATION_SPEED = 150;
 export const DOG_SPEED = 100;
 export const WIN_REWARD = 100;
 export const DOG_COLLISION_PENALTY = 20;
+export const CAT_REWARD = 10;

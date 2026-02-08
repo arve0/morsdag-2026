@@ -1,3 +1,5 @@
+import { GAME_WIDTH, GAME_HEIGHT } from '../data/constants.js';
+
 export default class BootScene extends Phaser.Scene {
     constructor() {
         super({ key: 'BootScene' });
@@ -81,10 +83,10 @@ export default class BootScene extends Phaser.Scene {
         if (!textures.exists('track')) {
             const graphics = this.add.graphics();
             graphics.fillStyle(0x228B22, 1);
-            graphics.fillRect(0, 0, 1024, 768);
+            graphics.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
             graphics.fillStyle(0x404040, 1);
-            graphics.fillRect(150, 150, 724, 468);
-            graphics.generateTexture('track', 1024, 768);
+            graphics.fillRect(150, 150, GAME_WIDTH - 300, GAME_HEIGHT - 300);
+            graphics.generateTexture('track', GAME_WIDTH, GAME_HEIGHT);
             graphics.destroy();
         }
 

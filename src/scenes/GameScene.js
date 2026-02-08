@@ -1,4 +1,4 @@
-import { START_AREA, FINISH_AREA, CAR_SPEED, CAR_ROTATION_SPEED, DOG_SPEED, WIN_REWARD, DOG_COLLISION_PENALTY } from '../data/constants.js';
+import { GAME_WIDTH, GAME_HEIGHT, START_AREA, FINISH_AREA, CAR_SPEED, CAR_ROTATION_SPEED, DOG_SPEED, WIN_REWARD, DOG_COLLISION_PENALTY, CAT_REWARD } from '../data/constants.js';
 
 export default class GameScene extends Phaser.Scene {
     constructor() {
@@ -7,8 +7,6 @@ export default class GameScene extends Phaser.Scene {
         this.cursors = null;
         this.dogs = null;
         this.cats = null;
-        this.startZone = null;
-        this.finishZone = null;
         this.hasStarted = false;
         this.hasFinished = false;
         this.canMove = false;
@@ -28,20 +26,18 @@ export default class GameScene extends Phaser.Scene {
         this.canMove = false;
 
         // Add track background first (not in container, always visible)
-        const track = this.add.image(512, 384, 'track');
+        const track = this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'track');
 
         // Create a container to hold game elements (initially hidden)
         this.gameContainer = this.add.container(0, 0);
         this.gameContainer.setAlpha(0);
 
-        // Create start area with checkered flag pattern
-        this.createStartArea();
-
-        // Create finish area
-        this.createFinishArea();
-
         // Create car
-        this.car = this.physics.add.sprite(START_AREA.x + 75, START_AREA.y + 50, 'car');
+        this.car = this.physics.add.sprite(
+            START_AREA.x + START_AREA.width / 2,
+            START_AREA.y + START_AREA.height / 2,
+            'car'
+        );
         this.car.setScale(0.1);
         this.car.setCollideWorldBounds(true);
         this.car.setDrag(0); // Ingen drag for konstant fart
@@ -177,100 +173,12 @@ export default class GameScene extends Phaser.Scene {
         });
     }
 
-    createStartArea() {
-        const graphics = this.add.graphics();
-
-        // Draw checkered pattern
-        const squareSize = 25;
-        for (let x = 0; x < START_AREA.width / squareSize; x++) {
-            for (let y = 0; y < START_AREA.height / squareSize; y++) {
-                if ((x + y) % 2 === 0) {
-                    graphics.fillStyle(0xffffff, 1);
-                } else {
-                    graphics.fillStyle(0x000000, 1);
-                }
-                graphics.fillRect(
-                    START_AREA.x + x * squareSize,
-                    START_AREA.y + y * squareSize,
-                    squareSize,
-                    squareSize
-                );
-            }
-        }
-
-        // Add to container
-        this.gameContainer.add(graphics);
-
-        // Add START text
-        const startText = this.add.text(START_AREA.x + 75, START_AREA.y - 30, 'START', {
-            fontSize: '32px',
-            fill: '#00ff00',
-            fontStyle: 'bold',
-            stroke: '#000000',
-            strokeThickness: 4
-        }).setOrigin(0.5);
-        this.gameContainer.add(startText);
-
-        // Create physics zone for start
-        this.startZone = this.add.zone(
-            START_AREA.x + START_AREA.width / 2,
-            START_AREA.y + START_AREA.height / 2,
-            START_AREA.width,
-            START_AREA.height
-        );
-        this.physics.world.enable(this.startZone);
-    }
-
-    createFinishArea() {
-        const graphics = this.add.graphics();
-
-        // Draw checkered pattern for finish
-        const squareSize = 25;
-        for (let x = 0; x < FINISH_AREA.width / squareSize; x++) {
-            for (let y = 0; y < FINISH_AREA.height / squareSize; y++) {
-                if ((x + y) % 2 === 0) {
-                    graphics.fillStyle(0xffffff, 1);
-                } else {
-                    graphics.fillStyle(0x000000, 1);
-                }
-                graphics.fillRect(
-                    FINISH_AREA.x + x * squareSize,
-                    FINISH_AREA.y + y * squareSize,
-                    squareSize,
-                    squareSize
-                );
-            }
-        }
-
-        // Add to container
-        this.gameContainer.add(graphics);
-
-        // Add FINISH text
-        const finishText = this.add.text(FINISH_AREA.x + 75, FINISH_AREA.y - 30, 'MÅL', {
-            fontSize: '32px',
-            fill: '#ff0000',
-            fontStyle: 'bold',
-            stroke: '#000000',
-            strokeThickness: 4
-        }).setOrigin(0.5);
-        this.gameContainer.add(finishText);
-
-        // Create physics zone for finish
-        this.finishZone = this.add.zone(
-            FINISH_AREA.x + FINISH_AREA.width / 2,
-            FINISH_AREA.y + FINISH_AREA.height / 2,
-            FINISH_AREA.width,
-            FINISH_AREA.height
-        );
-        this.physics.world.enable(this.finishZone);
-    }
-
     spawnDog() {
         if (this.hasFinished) return;
 
         // Spawn on left side only
         const x = -20;
-        const y = Phaser.Math.Between(200, 600);
+        const y = Phaser.Math.Between(Math.floor(GAME_HEIGHT * 0.26), Math.floor(GAME_HEIGHT * 0.78));
 
         // Move horizontally to the right with max 10 degrees diagonal
         // 10 degrees = ~0.176 radians, tan(10°) ≈ 0.176
@@ -287,8 +195,8 @@ export default class GameScene extends Phaser.Scene {
         if (this.hasFinished) return;
 
         // Spawn in center area, from top to bottom
-        const x = Phaser.Math.Between(362, 662);
-        const y = Phaser.Math.Between(100, 700);
+        const x = Phaser.Math.Between(Math.floor(GAME_WIDTH * 0.35), Math.floor(GAME_WIDTH * 0.65));
+        const y = Phaser.Math.Between(Math.floor(GAME_HEIGHT * 0.13), Math.floor(GAME_HEIGHT * 0.91));
 
         const cat = this.cats.create(x, y, 'cat');
         cat.setScale(0.1);
@@ -339,9 +247,10 @@ export default class GameScene extends Phaser.Scene {
 
         cat.destroy();
         window.gameState.catsCollected++;
+        window.gameState.money += CAT_REWARD;
 
         // Show floating text
-        const text = this.add.text(cat.x, cat.y, '+1 katt', {
+        const text = this.add.text(cat.x, cat.y, `+1 katt (+${CAT_REWARD} kr)`, {
             fontSize: '20px',
             fill: '#ffff00',
             fontStyle: 'bold'
@@ -442,7 +351,7 @@ export default class GameScene extends Phaser.Scene {
 
         // Remove dogs that have passed the right side of screen
         this.dogs.getChildren().forEach(dog => {
-            if (dog.x > 1044) {
+            if (dog.x > GAME_WIDTH + 20) {
                 dog.destroy();
             }
         });
@@ -450,7 +359,7 @@ export default class GameScene extends Phaser.Scene {
         // Check if reached finish
         if (this.hasStarted && !this.hasFinished) {
             const carBounds = this.car.getBounds();
-            const finishBounds = this.finishZone.getBounds();
+            const finishBounds = new Phaser.Geom.Rectangle(FINISH_AREA.x, FINISH_AREA.y, FINISH_AREA.width, FINISH_AREA.height);
 
             if (Phaser.Geom.Intersects.RectangleToRectangle(carBounds, finishBounds)) {
                 this.reachFinish();
@@ -492,11 +401,11 @@ export default class GameScene extends Phaser.Scene {
         // Create semi-transparent overlay
         const overlay = this.add.graphics();
         overlay.fillStyle(0x000000, 0.8);
-        overlay.fillRect(0, 0, 1024, 768);
+        overlay.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
         overlay.setDepth(100);
 
-        const centerX = 512;
-        const centerY = 384;
+        const centerX = GAME_WIDTH / 2;
+        const centerY = GAME_HEIGHT / 2;
 
         // Result text
         const resultText = window.gameState.hasWon ? 'DU VANT!' : 'FERDIG!';

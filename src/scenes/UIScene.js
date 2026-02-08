@@ -1,3 +1,5 @@
+import { GAME_WIDTH, GAME_HEIGHT } from '../data/constants.js';
+
 export default class UIScene extends Phaser.Scene {
     constructor() {
         super({ key: 'UIScene' });
@@ -11,13 +13,14 @@ export default class UIScene extends Phaser.Scene {
         // Money display (top right)
         const moneyBg = this.add.graphics();
         moneyBg.fillStyle(0x000000, 0.7);
-        moneyBg.fillRoundedRect(800, 10, 210, 60, 10);
+        const moneyBgX = GAME_WIDTH - 230;
+        moneyBg.fillRoundedRect(moneyBgX, 20, 210, 60, 10);
 
-        this.add.text(820, 20, '💰', {
+        this.add.text(moneyBgX + 20, 30, '💰', {
             fontSize: '32px'
         });
 
-        this.moneyText = this.add.text(870, 30, `${window.gameState.money} kr`, {
+        this.moneyText = this.add.text(moneyBgX + 70, 40, `${window.gameState.money} kr`, {
             fontSize: '28px',
             fill: '#ffff00',
             fontStyle: 'bold'
@@ -26,20 +29,21 @@ export default class UIScene extends Phaser.Scene {
         // Cat counter (top right, below money)
         const catBg = this.add.graphics();
         catBg.fillStyle(0x000000, 0.7);
-        catBg.fillRoundedRect(800, 80, 210, 60, 10);
+        const catBgX = GAME_WIDTH - 230;
+        catBg.fillRoundedRect(catBgX, 90, 210, 60, 10);
 
-        this.add.text(820, 90, '🐱', {
+        this.add.text(catBgX + 20, 100, '🐱', {
             fontSize: '32px'
         });
 
-        this.catText = this.add.text(870, 100, `${window.gameState.catsCollected}`, {
+        this.catText = this.add.text(catBgX + 70, 110, `${window.gameState.catsCollected}`, {
             fontSize: '28px',
             fill: '#ff9900',
             fontStyle: 'bold'
         });
 
         // Message text (midt på skjermen)
-        this.messageText = this.add.text(512, 384, '', {
+        this.messageText = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT / 2, '', {
             fontSize: '40px',
             fill: '#ffffff',
             fontStyle: 'bold',

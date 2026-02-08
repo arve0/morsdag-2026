@@ -1,4 +1,4 @@
-import { SHOP_PRICES, BERRY_POSITIONS } from '../data/constants.js';
+import { GAME_WIDTH, GAME_HEIGHT, SHOP_IMAGE_WIDTH, SHOP_IMAGE_HEIGHT, SHOP_PRICES, BERRY_POSITIONS } from '../data/constants.js';
 
 export default class ShopScene extends Phaser.Scene {
     constructor() {
@@ -9,11 +9,14 @@ export default class ShopScene extends Phaser.Scene {
 
     create() {
         // Shop background image
-        const shopBg = this.add.image(512, 384, 'butikk');
-        shopBg.setDisplaySize(1024, 768);
+        const shopBg = this.add.image(GAME_WIDTH / 2, GAME_HEIGHT / 2, 'butikk');
+        shopBg.setDisplaySize(GAME_WIDTH, GAME_HEIGHT);
+
+        const scaleX = GAME_WIDTH / SHOP_IMAGE_WIDTH;
+        const scaleY = GAME_HEIGHT / SHOP_IMAGE_HEIGHT;
 
         // Title
-        this.add.text(512, 50, '🛒 BUTIKKEN', {
+        this.add.text(GAME_WIDTH / 2, 80, '🛒 BUTIKKEN', {
             fontSize: '48px',
             fill: '#000000',
             fontStyle: 'bold',
@@ -24,13 +27,15 @@ export default class ShopScene extends Phaser.Scene {
         // Money display
         const moneyBg = this.add.graphics();
         moneyBg.fillStyle(0x000000, 0.8);
-        moneyBg.fillRoundedRect(800, 10, 210, 60, 10);
+        const moneyBgX = GAME_WIDTH - 230;
+        moneyBg.fillRoundedRect(moneyBgX, 20, 210, 60, 10);
+        this.moneyFlyTarget = { x: moneyBgX + 30, y: 60 };
 
-        this.add.text(820, 20, '💰', {
+        this.add.text(moneyBgX + 20, 30, '💰', {
             fontSize: '32px'
         });
 
-        this.moneyText = this.add.text(870, 30, `${window.gameState.money} kr`, {
+        this.moneyText = this.add.text(moneyBgX + 70, 40, `${window.gameState.money} kr`, {
             fontSize: '28px',
             fill: '#ffff00',
             fontStyle: 'bold'
@@ -41,10 +46,10 @@ export default class ShopScene extends Phaser.Scene {
         itemNames.forEach((itemName) => {
             if (BERRY_POSITIONS[itemName]) {
                 this.createBerryArea(
-                    BERRY_POSITIONS[itemName].x,
-                    BERRY_POSITIONS[itemName].y,
-                    BERRY_POSITIONS[itemName].width,
-                    BERRY_POSITIONS[itemName].height,
+                    BERRY_POSITIONS[itemName].x * scaleX,
+                    BERRY_POSITIONS[itemName].y * scaleY,
+                    BERRY_POSITIONS[itemName].width * scaleX,
+                    BERRY_POSITIONS[itemName].height * scaleY,
                     itemName,
                     SHOP_PRICES[itemName]
                 );
@@ -52,7 +57,7 @@ export default class ShopScene extends Phaser.Scene {
         });
 
         // Back button
-        const backButton = this.add.text(512, 700, '← Tilbake til spill', {
+        const backButton = this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 80, '← Tilbake til spill', {
             fontSize: '32px',
             fill: '#ffffff',
             backgroundColor: '#666666',
@@ -155,15 +160,15 @@ export default class ShopScene extends Phaser.Scene {
 
             this.tweens.add({
                 targets: moneyIcon,
-                y: 160,
-                x: 150,
+                y: this.moneyFlyTarget.y,
+                x: this.moneyFlyTarget.x,
                 alpha: 0,
                 duration: 1000,
                 ease: 'Power2'
             });
 
             // Show purchase message
-            const purchaseText = this.add.text(512, 150, `Kjøpte ${itemName}! -${price} kr`, {
+            const purchaseText = this.add.text(GAME_WIDTH / 2, 180, `Kjøpte ${itemName}! -${price} kr`, {
                 fontSize: '28px',
                 fill: '#00ff00',
                 fontStyle: 'bold',
@@ -198,7 +203,7 @@ export default class ShopScene extends Phaser.Scene {
 
         } else {
             // Not enough money
-            const errorText = this.add.text(512, 150, 'Ikke nok penger!', {
+            const errorText = this.add.text(GAME_WIDTH / 2, 180, 'Ikke nok penger!', {
                 fontSize: '32px',
                 fill: '#ff0000',
                 fontStyle: 'bold',

@@ -4,11 +4,17 @@ import GameScene from './scenes/GameScene.js';
 import ShopScene from './scenes/ShopScene.js';
 import UIScene from './scenes/UIScene.js';
 
+
+
 const config = {
     type: Phaser.AUTO,
     width: GAME_WIDTH,
     height: GAME_HEIGHT,
     parent: 'game-container',
+    scale: {
+        mode: Phaser.Scale.FIT,
+        autoCenter: Phaser.Scale.CENTER_BOTH
+    },
     physics: {
         default: 'arcade',
         arcade: {
